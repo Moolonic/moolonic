@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Moolonic Cloud</title>
+    <style>
+        :root {
+            --bg-base: #0C0D0E;
+            --bg-surface: #131517;
+            --text-primary: #e2e5ed;
+            --text-secondary: #8b90a0;
+            --text-muted: #555970;
+            --border: rgba(255, 255, 255, 0.06);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-base);
+            color: var(--text-primary);
+            font-family: "Segoe UI", sans-serif;
+            padding: 22px;
+        }
+
+        .panel {
+            width: 100%;
+            max-width: 380px;
+            padding: 28px 26px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            text-align: center;
+        }
+
+        .title {
+            font-size: 18px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .input {
+            width: 100%;
+            padding: 12px 14px;
+            background: var(--bg-base);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: "Consolas", monospace;
+            font-size: 18px;
+            letter-spacing: 4px;
+            text-align: center;
+            color: var(--text-primary);
+            outline: none;
+            transition: border-color 0.15s;
+        }
+
+        .input:focus {
+            border-color: #8b90a0;
+        }
+
+        .button {
+            padding: 10px 18px;
+            background: #8b90a0;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 12px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #fff;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s;
+        }
+
+        .button:hover {
+            background: rgba(139, 144, 160, 0.14);
+            color: #8b90a0;
+        }
+
+        .button:disabled {
+            opacity: 0.6;
+            cursor: default;
+        }
+
+        .error {
+            min-height: 18px;
+            margin-top: 12px;
+            font-size: 12px;
+            color: #ff7a6e;
+        }
+
+        .frame {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+            background: var(--bg-base);
+        }
+
+        .version-label {
+            position: fixed;
+            left: 50%;
+            bottom: 6px;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 11px;
+            pointer-events: none;
+            user-select: none;
+        }
+    </style>
+</head>
+
+<body>
+    <main class="panel" id="lock">
+        <h1 class="title">Введите пароль</h1>
+        <form class="form" id="form">
+            <input class="input" id="password" type="password" autocomplete="off" autofocus>
+            <button class="button" id="submit" type="submit">Открыть</button>
+        </form>
+        <div class="error" id="error"></div>
+    </main>
+    <iframe class="frame" id="frame" sandbox="allow-scripts allow-top-navigation" hidden></iframe>
+    <div class="version-label">Moolonic Cloud</div>
+    <script>
+        var WORKER_URL = "https://moolonic.maksimovdenis5702.workers.dev/";
+
+        var form = document.getElementById("form");
+        var input = document.getElementById("password");
+        var button = document.getElementById("submit");
+        var errorBox = document.getElementById("error");
+
+        form.addEventListener("submit", async function (event) {
+            event.preventDefault();
+            if (!input.value) return;
+            button.disabled = true;
+            errorBox.textContent = "";
+            try {
+                var response = await fetch(WORKER_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ action: "main", password: input.value })
+                });
+                var result = await response.json();
+                if (!response.ok || !result.success) {
+                    errorBox.textContent = result.error || "Ошибка";
+                    input.value = "";
+                    input.focus();
+                } else {
+                    var frame = document.getElementById("frame");
+                    frame.srcdoc = result.html;
+                    frame.hidden = false;
+                    document.getElementById("lock").hidden = true;
+                }
+            } catch (e) {
+                errorBox.textContent = "Не удалось связаться с сервером";
+            }
+            button.disabled = false;
+        });
+    </script>
+</body>
+
+</html>
