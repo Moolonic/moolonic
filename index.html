@@ -152,6 +152,25 @@
         .updated {
             font-size: 12px;
             color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border: 2px solid var(--text-muted);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         .ghost {
@@ -404,7 +423,10 @@
         <header class="topbar">
             <div class="brand">Moolonic Cloud</div>
             <div class="topbar-right">
-                <span class="updated" id="updated"></span>
+                <span class="updated" id="updated">
+                    <span class="spinner" id="spinner" hidden></span>
+                    <span id="updatedText">Обновлено: —</span>
+                </span>
                 <button class="ghost" id="logout" type="button">Выйти</button>
             </div>
         </header>
@@ -450,7 +472,7 @@
 
     <script>
         var WORKER_URL = "https://moolonic.maksimovdenis5702.workers.dev/";
-        var REFRESH_MS = 30000;
+        var REFRESH_MS = 5000;
         var HOUR = 3600000;
         var DAY = 86400000;
         var RANGES = {
@@ -462,6 +484,7 @@
 
         var password = "";
         var timer = null;
+        var isLoading = false;
         var state = { range: "24h", now: Date.now(), times: [], recent: [], active: 0, total: 0 };
 
         var lockBox = document.getElementById("lock");
@@ -471,6 +494,8 @@
         var button = document.getElementById("submit");
         var errorBox = document.getElementById("error");
         var tooltip = document.getElementById("tooltip");
+        var spinner = document.getElementById("spinner");
+        var updatedText = document.getElementById("updatedText");
 
         function pad(n) {
             return n < 10 ? "0" + n : String(n);
@@ -709,27 +734,35 @@
             renderCards();
             drawChart();
             renderRows();
-            document.getElementById("updated").textContent = "Обновлено: " + formatDate(Date.now());
+            updatedText.textContent = "Обновлено: " + formatDate(Date.now());
         }
 
         async function load() {
-            var response = await fetch(WORKER_URL, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ action: "dashboard", password: password })
-            });
-            var result = await response.json();
-            if (!response.ok || !result.success) {
-                var err = new Error(result.error || "Ошибка");
-                err.status = response.status;
-                throw err;
+            if (isLoading) return;
+            isLoading = true;
+            spinner.hidden = false;
+            try {
+                var response = await fetch(WORKER_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ action: "dashboard", password: password })
+                });
+                var result = await response.json();
+                if (!response.ok || !result.success) {
+                    var err = new Error(result.error || "Ошибка");
+                    err.status = response.status;
+                    throw err;
+                }
+                state.now = result.now;
+                state.times = result.times;
+                state.recent = result.recent;
+                state.active = result.active;
+                state.total = result.total;
+                renderAll();
+            } finally {
+                isLoading = false;
+                spinner.hidden = true;
             }
-            state.now = result.now;
-            state.times = result.times;
-            state.recent = result.recent;
-            state.active = result.active;
-            state.total = result.total;
-            renderAll();
         }
 
         function logout() {
@@ -755,6 +788,7 @@
                 drawChart();
                 timer = setInterval(function () {
                     load().catch(function (e) {
+                        console.error("Refresh error:", e);
                         if (e.status === 403) logout();
                     });
                 }, REFRESH_MS);
