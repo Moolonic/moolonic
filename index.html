@@ -1,612 +1,1230 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="robots" content="noindex, nofollow">
-<title>Moolonic Cloud</title>
-<style>
-:root{--bg-base:#0C0D0E;--bg-surface:#131517;--bg-hover:#1B1E21;--text-primary:#e2e5ed;--text-secondary:#8b90a0;--text-muted:#555970;--accent:#8b90a0;--chart:#f6821f;--ok:#5fd38d;--bad:#ff7a6e;--border:rgba(255,255,255,.06)}
-*{box-sizing:border-box;margin:0;padding:0}
-[hidden]{display:none!important}
-html,body{min-height:100%}
-body{background:var(--bg-base);color:var(--text-primary);font-family:"Segoe UI",sans-serif}
-.lock-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:22px}
-.panel{width:100%;max-width:380px;padding:28px 26px;background:var(--bg-surface);border:1px solid var(--border);border-radius:14px;text-align:center}
-.title{font-size:18px;font-weight:400;letter-spacing:1px;text-transform:uppercase}
-.subtitle{margin-top:8px;font-size:12px;color:var(--text-muted);line-height:1.6}
-.form{display:flex;flex-direction:column;gap:10px;margin-top:18px}
-.input{width:100%;padding:12px 14px;background:var(--bg-base);border:1px solid var(--border);border-radius:8px;font-family:"Consolas",monospace;font-size:18px;letter-spacing:4px;text-align:center;color:var(--text-primary);outline:none;transition:border-color .15s}
-.input:focus{border-color:#8b90a0}
-.button{padding:10px 18px;background:var(--accent);border:none;border-radius:8px;font-family:inherit;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:#fff;cursor:pointer;transition:background .15s,color .15s}
-.button:hover{background:rgba(139,144,160,.14);color:var(--accent)}
-.button:disabled{opacity:.6;cursor:default}
-.error{min-height:18px;margin-top:12px;font-size:12px;line-height:1.5;color:var(--bad);overflow-wrap:anywhere}
-.dash{max-width:1100px;margin:0 auto;padding:22px 22px 56px}
-.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap}
-.brand{font-size:16px;letter-spacing:1px;text-transform:uppercase}
-.topbar-right{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.live{display:flex;align-items:center;gap:7px;font-size:11px;letter-spacing:1px;color:var(--text-secondary)}
-.dot{width:7px;height:7px;border-radius:50%;background:var(--text-muted)}
-.live.ok .dot{background:var(--ok);box-shadow:0 0 0 0 rgba(95,211,141,.5);animation:pulse 2s infinite}
-.live.loading .dot{background:var(--chart)}
-.live.error .dot{background:var(--bad)}
-@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(95,211,141,.45)}70%{box-shadow:0 0 0 7px rgba(95,211,141,0)}100%{box-shadow:0 0 0 0 rgba(95,211,141,0)}}
-.updated{font-size:12px;color:var(--text-muted)}
-.ghost{padding:7px 14px;background:transparent;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:12px;color:var(--text-secondary);cursor:pointer;transition:background .15s,color .15s}
-.ghost:hover{background:var(--bg-hover);color:var(--text-primary)}
-.ghost:disabled{opacity:.5;cursor:default}
-.banner{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:12px 16px;margin-bottom:12px;background:rgba(255,122,110,.08);border:1px solid rgba(255,122,110,.25);border-radius:10px;font-size:12px;line-height:1.6;color:var(--bad);overflow-wrap:anywhere}
-.banner .ghost{flex-shrink:0;color:var(--bad);border-color:rgba(255,122,110,.3)}
-.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:12px}
-.stat{padding:16px 18px;background:var(--bg-surface);border:1px solid var(--border);border-radius:12px}
-.stat-label{font-size:11px;letter-spacing:.5px;color:var(--text-muted)}
-.stat-value{margin-top:6px;font-family:"Consolas",monospace;font-size:28px;color:var(--text-primary);transition:color .2s}
-.stat-value.bump{animation:bump .45s ease}
-@keyframes bump{0%{color:var(--chart);transform:translateY(2px)}100%{color:var(--text-primary);transform:translateY(0)}}
-.card{margin-bottom:12px;padding:18px 20px;background:var(--bg-surface);border:1px solid var(--border);border-radius:12px}
-.card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap}
-.card-title{font-size:14px;font-weight:400;letter-spacing:1px;text-transform:uppercase;color:var(--text-secondary)}
-.tabs{display:flex;gap:4px;padding:3px;background:var(--bg-base);border:1px solid var(--border);border-radius:8px}
-.tab{padding:5px 12px;background:transparent;border:none;border-radius:6px;font-family:inherit;font-size:12px;color:var(--text-secondary);cursor:pointer;transition:background .15s,color .15s}
-.tab:hover{color:var(--text-primary)}
-.tab.active{background:var(--bg-hover);color:var(--text-primary)}
-.chart-wrap{position:relative;width:100%}
-.chart-wrap svg{display:block;width:100%}
-.tooltip{position:absolute;z-index:5;padding:8px 12px;background:#1B1E21;border:1px solid rgba(255,255,255,.12);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.5);font-size:12px;line-height:1.5;white-space:nowrap;pointer-events:none}
-.tooltip-time{color:var(--text-secondary)}
-.tooltip-value{color:var(--text-primary)}
-.table-wrap{overflow-x:auto}
-table{width:100%;border-collapse:collapse;min-width:560px}
-th{padding:8px 10px;font-size:11px;font-weight:400;letter-spacing:.5px;text-align:left;color:var(--text-muted);border-bottom:1px solid var(--border)}
-td{padding:10px;font-size:13px;color:var(--text-primary);border-bottom:1px solid var(--border);white-space:nowrap}
-tr:last-child td{border-bottom:none}
-.mono{font-family:"Consolas",monospace}
-a.code-link{color:var(--text-primary);text-decoration:none;border-bottom:1px dashed var(--text-muted)}
-a.code-link:hover{color:var(--chart);border-color:var(--chart)}
-.pass-cell{display:flex;align-items:center;gap:8px}
-.copy{padding:3px 8px;background:transparent;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:11px;color:var(--text-secondary);cursor:pointer;transition:background .15s,color .15s}
-.copy:hover{background:var(--bg-hover);color:var(--text-primary)}
-.badge{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11px}
-.badge.active{background:rgba(95,211,141,.12);color:var(--ok)}
-.badge.expired{background:rgba(139,144,160,.14);color:var(--text-secondary)}
-.badge.deleted{background:rgba(255,122,110,.12);color:var(--bad)}
-.empty{padding:22px 0 8px;font-size:13px;text-align:center;color:var(--text-muted);line-height:1.7}
-.footer{font-size:11px;color:var(--text-muted);line-height:1.7;margin-top:4px}
-@media(max-width:820px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:520px){.dash{padding:16px 12px 48px}.updated{display:none}.card{padding:16px 14px}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Moolonic Cloud</title>
+    <style>
+        :root {
+            --bg-base: #0C0D0E;
+            --bg-surface: #131517;
+            --bg-hover: #1B1E21;
+            --text-primary: #e2e5ed;
+            --text-secondary: #8b90a0;
+            --text-muted: #555970;
+            --accent: #8b90a0;
+            --chart: #f6821f;
+            --ok: #5fd38d;
+            --bad: #ff7a6e;
+            --border: rgba(255, 255, 255, 0.06);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        html,
+        body {
+            min-height: 100%;
+        }
+
+        body {
+            background: var(--bg-base);
+            color: var(--text-primary);
+            font-family: "Segoe UI", sans-serif;
+        }
+
+        .lock-wrap {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 22px;
+        }
+
+        .panel {
+            width: 100%;
+            max-width: 380px;
+            padding: 28px 26px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            text-align: center;
+        }
+
+        .title {
+            font-size: 18px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .subtitle {
+            margin-top: 8px;
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .input {
+            width: 100%;
+            padding: 12px 14px;
+            background: var(--bg-base);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: "Consolas", monospace;
+            font-size: 18px;
+            letter-spacing: 4px;
+            text-align: center;
+            color: var(--text-primary);
+            outline: none;
+            transition: border-color 0.15s;
+        }
+
+        .input:focus {
+            border-color: #8b90a0;
+        }
+
+        .button {
+            padding: 10px 18px;
+            background: var(--accent);
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 12px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #fff;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s;
+        }
+
+        .button:hover {
+            background: rgba(139, 144, 160, 0.14);
+            color: var(--accent);
+        }
+
+        .button:disabled {
+            opacity: 0.6;
+            cursor: default;
+        }
+
+        .error {
+            min-height: 18px;
+            margin-top: 12px;
+            font-size: 12px;
+            line-height: 1.5;
+            color: var(--bad);
+            overflow-wrap: anywhere;
+        }
+
+        .dash {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 22px 22px 56px;
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .brand {
+            font-size: 16px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .live {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 11px;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+        }
+
+        .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--text-muted);
+        }
+
+        .live.ok .dot {
+            background: var(--ok);
+            box-shadow: 0 0 0 0 rgba(95, 211, 141, 0.5);
+            animation: pulse 2s infinite;
+        }
+
+        .live.loading .dot {
+            background: var(--chart);
+        }
+
+        .live.error .dot {
+            background: var(--bad);
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(95, 211, 141, 0.45);
+            }
+
+            70% {
+                box-shadow: 0 0 0 7px rgba(95, 211, 141, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(95, 211, 141, 0);
+            }
+        }
+
+        .updated {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .ghost {
+            padding: 7px 14px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 12px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s;
+        }
+
+        .ghost:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .ghost:disabled {
+            opacity: 0.5;
+            cursor: default;
+        }
+
+        .banner {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px 16px;
+            margin-bottom: 12px;
+            background: rgba(255, 122, 110, 0.08);
+            border: 1px solid rgba(255, 122, 110, 0.25);
+            border-radius: 10px;
+            font-size: 12px;
+            line-height: 1.6;
+            color: var(--bad);
+            overflow-wrap: anywhere;
+        }
+
+        .banner .ghost {
+            flex-shrink: 0;
+            color: var(--bad);
+            border-color: rgba(255, 122, 110, 0.3);
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .stat {
+            padding: 16px 18px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+        }
+
+        .stat-value {
+            margin-top: 6px;
+            font-family: "Consolas", monospace;
+            font-size: 28px;
+            color: var(--text-primary);
+            transition: color 0.2s;
+        }
+
+        .stat-value.bump {
+            animation: bump 0.45s ease;
+        }
+
+        @keyframes bump {
+            0% {
+                color: var(--chart);
+                transform: translateY(2px);
+            }
+
+            100% {
+                color: var(--text-primary);
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            margin-bottom: 12px;
+            padding: 18px 20px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+
+        .card-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .card-title {
+            font-size: 14px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 4px;
+            padding: 3px;
+            background: var(--bg-base);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        .tab {
+            padding: 5px 12px;
+            background: transparent;
+            border: none;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 12px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s;
+        }
+
+        .tab:hover {
+            color: var(--text-primary);
+        }
+
+        .tab.active {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .chart-wrap {
+            position: relative;
+            width: 100%;
+        }
+
+        .chart-wrap svg {
+            display: block;
+            width: 100%;
+        }
+
+        .tooltip {
+            position: absolute;
+            z-index: 5;
+            padding: 8px 12px;
+            background: #1B1E21;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            font-size: 12px;
+            line-height: 1.5;
+            white-space: nowrap;
+            pointer-events: none;
+        }
+
+        .tooltip-time {
+            color: var(--text-secondary);
+        }
+
+        .tooltip-value {
+            color: var(--text-primary);
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 560px;
+        }
+
+        th {
+            padding: 8px 10px;
+            font-size: 11px;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+            text-align: left;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 10px;
+            font-size: 13px;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .mono {
+            font-family: "Consolas", monospace;
+        }
+
+        a.code-link {
+            color: var(--text-primary);
+            text-decoration: none;
+            border-bottom: 1px dashed var(--text-muted);
+        }
+
+        a.code-link:hover {
+            color: var(--chart);
+            border-color: var(--chart);
+        }
+
+        .pass-cell {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .copy {
+            padding: 3px 8px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 11px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s;
+        }
+
+        .copy:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 9px;
+            border-radius: 999px;
+            font-size: 11px;
+        }
+
+        .badge.active {
+            background: rgba(95, 211, 141, 0.12);
+            color: var(--ok);
+        }
+
+        .badge.expired {
+            background: rgba(139, 144, 160, 0.14);
+            color: var(--text-secondary);
+        }
+
+        .badge.deleted {
+            background: rgba(255, 122, 110, 0.12);
+            color: var(--bad);
+        }
+
+        .empty {
+            padding: 22px 0 8px;
+            font-size: 13px;
+            text-align: center;
+            color: var(--text-muted);
+            line-height: 1.7;
+        }
+
+        .footer {
+            font-size: 11px;
+            color: var(--text-muted);
+            line-height: 1.7;
+            margin-top: 4px;
+        }
+
+        @media (max-width: 820px) {
+            .cards {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 520px) {
+            .dash {
+                padding: 16px 12px 48px;
+            }
+
+            .updated {
+                display: none;
+            }
+
+            .card {
+                padding: 16px 14px;
+            }
+        }
+    </style>
 </head>
 <body>
-<div class="lock-wrap" id="lock">
-<main class="panel">
-<h1 class="title">Moolonic Cloud</h1>
-<p class="subtitle">Панель управления страницами</p>
-<form class="form" id="form">
-<input class="input" id="password" type="password" autocomplete="off" autofocus>
-<button class="button" id="submit" type="submit">Открыть</button>
-</form>
-<div class="error" id="error"></div>
-</main>
-</div>
-<div class="dash" id="dash" hidden>
-<header class="topbar">
-<div class="brand">Moolonic Cloud</div>
-<div class="topbar-right">
-<div class="live" id="live"><span class="dot"></span><span id="liveText">ПОДКЛЮЧЕНИЕ</span></div>
-<span class="updated" id="updatedText">Обновлено: —</span>
-<button class="ghost" id="refresh" type="button">Обновить</button>
-<button class="ghost" id="logout" type="button">Выйти</button>
-</div>
-</header>
-<div class="banner" id="banner" hidden>
-<span id="bannerText"></span>
-<button class="ghost" id="bannerRetry" type="button">Повторить</button>
-</div>
-<section class="cards" id="cards">
-<div class="stat"><div class="stat-label">За 24 часа</div><div class="stat-value" id="statDay">0</div></div>
-<div class="stat"><div class="stat-label">За 7 дней</div><div class="stat-value" id="statWeek">0</div></div>
-<div class="stat"><div class="stat-label">Активных сейчас</div><div class="stat-value" id="statActive">0</div></div>
-<div class="stat"><div class="stat-label">Всего за 30 дней</div><div class="stat-value" id="statTotal">0</div></div>
-</section>
-<section class="card">
-<div class="card-head">
-<h2 class="card-title">Новые ссылки</h2>
-<div class="tabs" id="tabs">
-<button class="tab active" type="button" data-range="24h">24 часа</button>
-<button class="tab" type="button" data-range="7d">7 дней</button>
-<button class="tab" type="button" data-range="30d">30 дней</button>
-</div>
-</div>
-<div class="chart-wrap" id="chartWrap">
-<svg id="chart" role="img" aria-label="График созданных страниц"></svg>
-<div class="tooltip" id="tooltip" hidden></div>
-</div>
-</section>
-<section class="card">
-<div class="card-head"><h2 class="card-title">Последние страницы</h2></div>
-<div class="table-wrap">
-<table>
-<thead><tr><th>Код</th><th>Пароль</th><th>Создана</th><th>Удаляется</th><th>Статус</th></tr></thead>
-<tbody id="rows"></tbody>
-</table>
-</div>
-<div class="empty" id="empty" hidden>Пока нет созданных страниц</div>
-</section>
-<div class="footer" id="storageText"></div>
-</div>
-<script>
-(function() {
-  "use strict";
-  var WORKER_URL = location.hostname.endsWith("workers.dev")
-    ? location.origin + "/"
-    : "https://moolonic.maksimovdenis5702.workers.dev/";
-  var PAGE_BASE = "https://moolonic.github.io/moolonic/";
-  var REFRESH_MS = 5000;
-  var TIMEOUT_MS = 12000;
-  var HOUR = 3600000;
-  var DAY = 86400000;
-  var RANGES = {
-    "24h": { count: 24, step: HOUR },
-    "7d": { count: 28, step: 6 * HOUR },
-    "30d": { count: 30, step: DAY }
-  };
-  var STATUS_LABELS = { active: "Активна", expired: "Истекла", deleted: "Удалена" };
-  function $(id) { return document.getElementById(id); }
-  var password = "";
-  var authenticated = false;
-  var loading = false;
-  var timer = null;
-  var clockTimer = null;
-  var controller = null;
-  var failures = 0;
-  var seconds = 0;
-  var lastRowsKey = "";
-  var lastChartKey = "";
-  var state = {
-    range: "24h", now: Date.now(), receivedAt: Date.now(),
-    times: [], expiries: [], recent: [], active: 0, total: 0, storage: ""
-  };
+    <div class="lock-wrap" id="lock">
+        <main class="panel">
+            <h1 class="title">Moolonic Cloud</h1>
+            <p class="subtitle">Панель управления страницами</p>
+            <form class="form" id="form">
+                <input class="input" id="password" type="password" autocomplete="off" autofocus>
+                <button class="button" id="submit" type="submit">Открыть</button>
+            </form>
+            <div class="error" id="error"></div>
+        </main>
+    </div>
 
-  function pad(n) { return n < 10 ? "0" + n : String(n); }
-  function formatDate(ms) {
-    var d = new Date(ms);
-    return pad(d.getDate()) + "." + pad(d.getMonth() + 1) + " " + pad(d.getHours()) + ":" + pad(d.getMinutes());
-  }
-  function formatShortDate(ms) {
-    var d = new Date(ms);
-    return pad(d.getDate()) + "." + pad(d.getMonth() + 1);
-  }
-  function formatHour(ms) { return pad(new Date(ms).getHours()) + ":00"; }
-  function alignEnd(now, step) {
-    if (step === DAY) {
-      var d = new Date(now);
-      d.setHours(24, 0, 0, 0);
-      return d.getTime();
-    }
-    return Math.ceil(now / step) * step;
-  }
+    <div class="dash" id="dash" hidden>
+        <header class="topbar">
+            <div class="brand">Moolonic Cloud</div>
+            <div class="topbar-right">
+                <div class="live" id="live">
+                    <span class="dot"></span>
+                    <span id="liveText">ПОДКЛЮЧЕНИЕ</span>
+                </div>
+                <span class="updated" id="updatedText">Обновлено: —</span>
+                <button class="ghost" id="refresh" type="button">Обновить</button>
+                <button class="ghost" id="logout" type="button">Выйти</button>
+            </div>
+        </header>
 
-  function setLive(mode) {
-    var el = $("live");
-    el.className = "live " + (mode === "live" ? "ok" : mode);
-    $("liveText").textContent = { live: "LIVE", loading: "ОБНОВЛЕНИЕ", error: "НЕТ СВЯЗИ", paused: "ПАУЗА" }[mode] || "ОЖИДАНИЕ";
-  }
+        <div class="banner" id="banner" hidden>
+            <span id="bannerText"></span>
+            <button class="ghost" id="bannerRetry" type="button">Повторить</button>
+        </div>
 
-  function showBanner(msg) {
-    $("bannerText").textContent = msg;
-    $("banner").hidden = false;
-  }
+        <section class="cards" id="cards">
+            <div class="stat">
+                <div class="stat-label">За 24 часа</div>
+                <div class="stat-value" id="statDay">0</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">За 7 дней</div>
+                <div class="stat-value" id="statWeek">0</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Активных сейчас</div>
+                <div class="stat-value" id="statActive">0</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Всего за 30 дней</div>
+                <div class="stat-value" id="statTotal">0</div>
+            </div>
+        </section>
 
-  function hideBanner() { $("banner").hidden = true; }
+        <section class="card">
+            <div class="card-head">
+                <h2 class="card-title">Новые ссылки</h2>
+                <div class="tabs" id="tabs">
+                    <button class="tab active" type="button" data-range="24h">24 часа</button>
+                    <button class="tab" type="button" data-range="7d">7 дней</button>
+                    <button class="tab" type="button" data-range="30d">30 дней</button>
+                </div>
+            </div>
+            <div class="chart-wrap" id="chartWrap">
+                <svg id="chart" role="img" aria-label="График созданных страниц"></svg>
+                <div class="tooltip" id="tooltip" hidden></div>
+            </div>
+        </section>
 
-  function buildBuckets(times, key, now) {
-    var cfg = RANGES[key];
-    var end = alignEnd(now, cfg.step);
-    var start = end - cfg.count * cfg.step;
-    var buckets = [];
-    for (var i = 0; i < cfg.count; i++) {
-      buckets.push({ from: start + i * cfg.step, to: start + (i + 1) * cfg.step, value: 0 });
-    }
-    times.forEach(function(t) {
-      if (t >= start && t < end) {
-        var idx = Math.floor((t - start) / cfg.step);
-        if (buckets[idx]) buckets[idx].value++;
-      }
-    });
-    return buckets;
-  }
+        <section class="card">
+            <div class="card-head">
+                <h2 class="card-title">Последние страницы</h2>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Код</th>
+                            <th>Пароль</th>
+                            <th>Создана</th>
+                            <th>Удаляется</th>
+                            <th>Статус</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rows"></tbody>
+                </table>
+            </div>
+            <div class="empty" id="empty" hidden>Пока нет созданных страниц</div>
+        </section>
 
-  function svgEl(name, attrs) {
-    var el = document.createElementNS("http://www.w3.org/2000/svg", name);
-    Object.keys(attrs).forEach(function(k) { el.setAttribute(k, attrs[k]); });
-    return el;
-  }
+        <div class="footer" id="storageText"></div>
+    </div>
 
-  function bucketLabel(bucket, index, key) {
-    if (key === "24h") return index % 4 === 0 ? formatHour(bucket.from) : "";
-    if (key === "7d") return new Date(bucket.from).getHours() === 0 ? formatShortDate(bucket.from) : "";
-    return index % 5 === 0 ? formatShortDate(bucket.from) : "";
-  }
+    <script>
+        (function () {
+            "use strict";
 
-  function tooltipTitle(bucket, key) {
-    if (key === "30d") return formatShortDate(bucket.from);
-    return formatDate(bucket.from) + " – " + formatHour(bucket.to);
-  }
+            var WORKER_URL = location.hostname.endsWith("workers.dev")
+                ? location.origin + "/"
+                : "https://moolonic.maksimovdenis5702.workers.dev/";
 
-  function drawChart() {
-    if ($("dash").hidden) return;
-    var svg = $("chart");
-    var wrap = $("chartWrap");
-    var tooltip = $("tooltip");
-    var W = wrap.clientWidth || 700;
-    var H = 260, padL = 34, padR = 6, padT = 10, padB = 26;
-    var innerW = W - padL - padR, innerH = H - padT - padB;
-    svg.setAttribute("width", W);
-    svg.setAttribute("height", H);
-    svg.setAttribute("viewBox", "0 0 " + W + " " + H);
-    while (svg.firstChild) svg.removeChild(svg.firstChild);
-    tooltip.hidden = true;
-    var elapsed = authenticated ? Date.now() - state.receivedAt : 0;
-    var buckets = buildBuckets(state.times, state.range, state.now + elapsed);
-    var peak = 0;
-    buckets.forEach(function(b) { if (b.value > peak) peak = b.value; });
-    var top = Math.max(4, Math.ceil(peak / 4) * 4);
-    for (var i = 0; i <= 4; i++) {
-      var y = padT + innerH - (innerH * i) / 4;
-      svg.appendChild(svgEl("line", { x1: padL, x2: W - padR, y1: y, y2: y, stroke: "rgba(255,255,255,0.06)", "stroke-width": 1 }));
-      var tick = svgEl("text", { x: padL - 8, y: y + 4, "text-anchor": "end", "font-size": 10, fill: "#555970" });
-      tick.textContent = String((top * i) / 4);
-      svg.appendChild(tick);
-    }
-    if (peak === 0) {
-      var emptyText = svgEl("text", { x: padL + innerW / 2, y: padT + innerH / 2, "text-anchor": "middle", "font-size": 12, fill: "#555970" });
-      emptyText.textContent = "Нет созданных страниц за этот период";
-      svg.appendChild(emptyText);
-    }
-    var slot = innerW / buckets.length;
-    var barW = Math.max(2, slot * 0.7);
-    buckets.forEach(function(bucket, index) {
-      var x = padL + index * slot;
-      var h = (innerH * bucket.value) / top;
-      var bar = svgEl("rect", {
-        x: x + (slot - barW) / 2, y: padT + innerH - h,
-        width: barW, height: Math.max(h, bucket.value > 0 ? 2 : 0),
-        rx: 2, fill: "#f6821f", opacity: 0.85
-      });
-      svg.appendChild(bar);
-      var label = bucketLabel(bucket, index, state.range);
-      if (label) {
-        var text = svgEl("text", { x: x + slot / 2, y: H - 8, "text-anchor": "middle", "font-size": 10, fill: "#555970" });
-        text.textContent = label;
-        svg.appendChild(text);
-      }
-      var zone = svgEl("rect", { x: x, y: padT, width: slot, height: innerH, fill: "transparent" });
-      zone.addEventListener("mouseenter", function() {
-        bar.setAttribute("opacity", "1");
-        tooltip.textContent = "";
-        var time = document.createElement("div");
-        time.className = "tooltip-time";
-        time.textContent = tooltipTitle(bucket, state.range);
-        var value = document.createElement("div");
-        value.className = "tooltip-value";
-        value.textContent = "Создано: " + bucket.value;
-        tooltip.appendChild(time);
-        tooltip.appendChild(value);
-        tooltip.hidden = false;
-        var width = tooltip.offsetWidth;
-        var left = Math.max(0, Math.min(W - width, x + slot / 2 - width / 2));
-        tooltip.style.left = left + "px";
-        tooltip.style.top = "0px";
-      });
-      zone.addEventListener("mouseleave", function() {
-        bar.setAttribute("opacity", "0.85");
-        tooltip.hidden = true;
-      });
-      svg.appendChild(zone);
-    });
-  }
+            var PAGE_BASE = "https://moolonic.github.io/moolonic/";
+            var REFRESH_MS = 5000;
 
-  function setStat(id, value) {
-    var el = $(id);
-    var text = String(value);
-    if (el.textContent === text) return;
-    el.textContent = text;
-    el.classList.remove("bump");
-    void el.offsetWidth;
-    el.classList.add("bump");
-  }
+            var HOUR = 3600000;
+            var DAY = 86400000;
 
-  function renderCards() {
-    var now = state.now;
-    var day = state.times.filter(function(t) { return t >= now - DAY; }).length;
-    var week = state.times.filter(function(t) { return t >= now - 7 * DAY; }).length;
-    setStat("statDay", day);
-    setStat("statWeek", week);
-    setStat("statActive", state.active);
-    setStat("statTotal", state.total);
-  }
+            var RANGES = {
+                "24h": { count: 24, step: HOUR },
+                "7d": { count: 28, step: 6 * HOUR },
+                "30d": { count: 30, step: DAY }
+            };
 
-  function copyText(text, button) {
-    function done(ok) {
-      button.textContent = ok ? "Скопировано" : "Ошибка";
-      setTimeout(function() { button.textContent = "Копировать"; }, 1200);
-    }
-    function fallback() {
-      var ta = document.createElement("textarea");
-      ta.value = text;
-      ta.style.position = "fixed";
-      ta.style.opacity = "0";
-      document.body.appendChild(ta);
-      ta.select();
-      var ok = false;
-      try { ok = document.execCommand("copy"); } catch (e) {}
-      ta.remove();
-      done(ok);
-    }
-    if (navigator.clipboard && window.isSecureContext) {
-      navigator.clipboard.writeText(text).then(function() { done(true); }, fallback);
-    } else { fallback(); }
-  }
+            var STATUS_LABELS = {
+                active: "Активна",
+                expired: "Истекла",
+                deleted: "Удалена"
+            };
 
-  function rowsKey() {
-    return state.recent.map(function(i) {
-      return i.code + "|" + i.password + "|" + i.createdAt + "|" + i.expiresAt + "|" + i.status;
-    }).join(";");
-  }
+            function $(id) {
+                return document.getElementById(id);
+            }
 
-  function renderRows() {
-    var body = $("rows");
-    body.textContent = "";
-    $("empty").hidden = state.recent.length > 0;
-    state.recent.forEach(function(item, index) {
-      var row = document.createElement("tr");
-      var codeCell = document.createElement("td");
-      codeCell.className = "mono";
-      var link = document.createElement("a");
-      link.className = "code-link";
-      link.href = PAGE_BASE + item.code + "/";
-      link.target = "_blank";
-      link.rel = "noopener noreferrer";
-      link.textContent = item.code;
-      codeCell.appendChild(link);
-      var passCell = document.createElement("td");
-      var passBox = document.createElement("div");
-      passBox.className = "pass-cell";
-      var passText = document.createElement("span");
-      passText.className = "mono";
-      passText.textContent = item.password;
-      var copy = document.createElement("button");
-      copy.className = "copy";
-      copy.type = "button";
-      copy.textContent = "Копировать";
-      copy.addEventListener("click", function() { copyText(item.password, copy); });
-      passBox.appendChild(passText);
-      passBox.appendChild(copy);
-      passCell.appendChild(passBox);
-      var createdCell = document.createElement("td");
-      createdCell.textContent = formatDate(item.createdAt);
-      var expiresCell = document.createElement("td");
-      expiresCell.textContent = formatDate(item.expiresAt);
-      var statusCell = document.createElement("td");
-      var badge = document.createElement("span");
-      badge.id = "status-" + index;
-      badge.className = "badge " + item.status;
-      badge.textContent = STATUS_LABELS[item.status] || item.status;
-      badge.dataset.status = item.status;
-      statusCell.appendChild(badge);
-      row.appendChild(codeCell);
-      row.appendChild(passCell);
-      row.appendChild(createdCell);
-      row.appendChild(expiresCell);
-      row.appendChild(statusCell);
-      body.appendChild(row);
-    });
-  }
+            var password = "";
+            var authenticated = false;
+            var loading = false;
+            var timer = null;
+            var clockTimer = null;
+            var failures = 0;
+            var seconds = 0;
+            var lastRowsKey = "";
+            var lastChartKey = "";
 
-  function renderLiveStatus() {
-    var now = Date.now();
-    if (state.expiries && state.expiries.length) {
-      var active = 0;
-      state.expiries.forEach(function(t) { if (t > now) active++; });
-      $("statActive").textContent = String(active);
-    }
-    state.recent.forEach(function(item, index) {
-      var el = $("status-" + index);
-      if (!el) return;
-      var status = item.status === "deleted" ? "deleted" : (item.expiresAt <= now ? "expired" : "active");
-      if (el.dataset.status !== status) {
-        el.className = "badge " + status;
-        el.textContent = STATUS_LABELS[status];
-        el.dataset.status = status;
-      }
-    });
-  }
+            var state = {
+                range: "24h",
+                now: Date.now(),
+                receivedAt: Date.now(),
+                times: [],
+                expiries: [],
+                recent: [],
+                active: 0,
+                total: 0,
+                storage: ""
+            };
 
-  function chartKey() {
-    return state.range + "|" + state.times.join(",") + "|" + Math.floor(Date.now() / 60000);
-  }
+            function pad(n) {
+                return n < 10 ? "0" + n : String(n);
+            }
 
-  function renderAll() {
-    renderCards();
-    var rk = rowsKey();
-    if (rk !== lastRowsKey) { renderRows(); lastRowsKey = rk; }
-    var ck = chartKey();
-    if (ck !== lastChartKey) { drawChart(); lastChartKey = ck; }
-    renderLiveStatus();
-    $("updatedText").textContent = "Обновлено: " + formatDate(Date.now());
-    $("storageText").textContent = "Хранилище: " + (state.storage === "kv" ? "KV" : "GitHub") + " · Обновление каждые " + (REFRESH_MS / 1000) + " сек";
-  }
+            function formatDate(ms) {
+                var d = new Date(ms);
+                return pad(d.getDate()) + "." + pad(d.getMonth() + 1) + " " + pad(d.getHours()) + ":" + pad(d.getMinutes());
+            }
 
-  async function load() {
-    if (loading) return;
-    loading = true;
-    setLive("loading");
-    $("refresh").disabled = true;
-    controller = new AbortController();
-    var timeout = setTimeout(function() { if (controller) controller.abort(); }, TIMEOUT_MS);
-    try {
-      var response = await fetch(WORKER_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Accept": "application/json" },
-        body: JSON.stringify({ action: "dashboard", password: password }),
-        signal: controller.signal,
-        cache: "no-store"
-      });
-      var raw = await response.text();
-      var data = null;
-      try { data = JSON.parse(raw); } catch (e) {}
-      if (!response.ok || !data || !data.success) {
-        var message;
-        if (data && data.error) message = data.error;
-        else if (response.status === 404) message = "Воркер не найден по адресу " + WORKER_URL;
-        else if (response.status === 403) message = "Сервер отклонил пароль";
-        else if (response.status >= 500) message = "Ошибка воркера (HTTP " + response.status + ")";
-        else message = "Сервер вернул не JSON (HTTP " + response.status + ")";
-        var err = new Error(message);
-        err.httpStatus = response.status;
-        err.serverError = !!(data && data.error);
-        throw err;
-      }
-      if (!Array.isArray(data.times) || !Array.isArray(data.recent)) {
-        throw new Error("Сервер вернул некорректный формат данных");
-      }
-      state.now = data.now || Date.now();
-      state.receivedAt = Date.now();
-      state.times = data.times;
-      state.expiries = Array.isArray(data.expiries) ? data.expiries : [];
-      state.recent = data.recent;
-      state.active = data.active || 0;
-      state.total = data.total || 0;
-      state.storage = data.storage || "";
-      failures = 0;
-      hideBanner();
-      renderAll();
-      setLive("live");
-    } catch (e) {
-      failures++;
-      var msg;
-      if (e.name === "AbortError") msg = "Таймаут: воркер не ответил за " + (TIMEOUT_MS / 1000) + " секунд.";
-      else if (e.message === "Failed to fetch" || e.name === "TypeError") msg = "Не удалось связаться с сервером: " + WORKER_URL;
-      else msg = e.message;
-      if (e.httpStatus === 403) {
-        logout();
-        $("error").textContent = "Неверный пароль.";
-        throw e;
-      }
-      setLive("error");
-      showBanner(msg + (authenticated ? " Повторим автоматически." : ""));
-      throw e;
-    } finally {
-      clearTimeout(timeout);
-      loading = false;
-      controller = null;
-      $("refresh").disabled = false;
-    }
-  }
+            function formatShortDate(ms) {
+                var d = new Date(ms);
+                return pad(d.getDate()) + "." + pad(d.getMonth() + 1);
+            }
 
-  async function tick() {
-    if (timer) { clearTimeout(timer); timer = null; }
-    if (!authenticated) return;
-    if (document.hidden) {
-      setLive("paused");
-      timer = setTimeout(tick, REFRESH_MS);
-      return;
-    }
-    try { await load(); } catch (e) {}
-    if (authenticated) timer = setTimeout(tick, REFRESH_MS);
-  }
+            function formatHour(ms) {
+                return pad(new Date(ms).getHours()) + ":00";
+            }
 
-  function liveClock() {
-    if (!authenticated || document.hidden) return;
-    seconds++;
-    renderLiveStatus();
-    if (seconds % 60 === 0) drawChart();
-  }
+            function alignEnd(now, step) {
+                if (step === DAY) {
+                    var d = new Date(now);
+                    d.setHours(24, 0, 0, 0);
+                    return d.getTime();
+                }
+                return Math.ceil(now / step) * step;
+            }
 
-  function start() {
-    authenticated = true;
-    failures = 0;
-    if (timer) clearTimeout(timer);
-    timer = setTimeout(tick, 0);
-    if (!clockTimer) clockTimer = setInterval(liveClock, 1000);
-  }
+            function setLive(mode) {
+                var el = $("live");
+                el.className = "live " + (mode === "live" ? "ok" : mode);
+                $("liveText").textContent = {
+                    live: "LIVE",
+                    loading: "ОБНОВЛЕНИЕ",
+                    error: "НЕТ СВЯЗИ",
+                    paused: "ПАУЗА"
+                }[mode] || "ОЖИДАНИЕ";
+            }
 
-  function logout() {
-    authenticated = false;
-    if (timer) clearTimeout(timer);
-    if (clockTimer) clearInterval(clockTimer);
-    if (controller) { try { controller.abort(); } catch (e) {} }
-    timer = null;
-    clockTimer = null;
-    loading = false;
-    password = "";
-    lastRowsKey = "";
-    lastChartKey = "";
-    $("dash").hidden = true;
-    $("lock").hidden = false;
-    $("banner").hidden = true;
-    $("password").value = "";
-    $("password").focus();
-  }
+            function showBanner(msg) {
+                $("bannerText").textContent = msg;
+                $("banner").hidden = false;
+            }
 
-  $("form").addEventListener("submit", async function(event) {
-    event.preventDefault();
-    var value = $("password").value;
-    if (!value) { $("error").textContent = "Введите пароль."; return; }
-    $("submit").disabled = true;
-    $("error").textContent = "";
-    password = value;
-    try {
-      await load();
-      $("lock").hidden = true;
-      $("dash").hidden = false;
-      drawChart();
-      start();
-      $("password").value = "";
-    } catch (e) {
-      password = "";
-      $("error").textContent = e.httpStatus === 403 ? "Неверный пароль." : (e.serverError ? e.message : "Не удалось связаться с сервером. " + e.message);
-      $("password").value = "";
-      $("password").focus();
-    } finally {
-      $("submit").disabled = false;
-    }
-  });
+            function hideBanner() {
+                $("banner").hidden = true;
+            }
 
-  $("logout").addEventListener("click", logout);
-  $("refresh").addEventListener("click", function() {
-    if (!authenticated) return;
-    load().catch(function() {});
-  });
-  $("bannerRetry").addEventListener("click", function() {
-    if (authenticated) load().catch(function() {});
-    else { hideBanner(); $("password").focus(); }
-  });
-  $("tabs").addEventListener("click", function(event) {
-    var target = event.target.closest(".tab");
-    if (!target) return;
-    state.range = target.getAttribute("data-range");
-    document.querySelectorAll(".tab").forEach(function(el) {
-      el.classList.toggle("active", el === target);
-    });
-    lastChartKey = "";
-    drawChart();
-  });
-  var resizeTimer = null;
-  window.addEventListener("resize", function() {
-    if (resizeTimer) clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(function() {
-      if (!$("dash").hidden) { lastChartKey = ""; drawChart(); }
-    }, 120);
-  });
-  document.addEventListener("visibilitychange", function() {
-    if (!authenticated) return;
-    if (!document.hidden) { seconds = 0; load().catch(function() {}); }
-    else setLive("paused");
-  });
-  $("password").focus();
-})();
-</script>
+            function buildBuckets(times, key, now) {
+                var cfg = RANGES[key];
+                var end = alignEnd(now, cfg.step);
+                var start = end - cfg.count * cfg.step;
+                var buckets = [];
+                for (var i = 0; i < cfg.count; i++) {
+                    buckets.push({
+                        from: start + i * cfg.step,
+                        to: start + (i + 1) * cfg.step,
+                        value: 0
+                    });
+                }
+                times.forEach(function (t) {
+                    if (t >= start && t < end) {
+                        var idx = Math.floor((t - start) / cfg.step);
+                        if (buckets[idx]) buckets[idx].value++;
+                    }
+                });
+                return buckets;
+            }
+
+            function svgEl(name, attrs) {
+                var el = document.createElementNS("http://www.w3.org/2000/svg", name);
+                Object.keys(attrs).forEach(function (k) {
+                    el.setAttribute(k, attrs[k]);
+                });
+                return el;
+            }
+
+            function bucketLabel(bucket, index, key) {
+                if (key === "24h") return index % 4 === 0 ? formatHour(bucket.from) : "";
+                if (key === "7d") return new Date(bucket.from).getHours() === 0 ? formatShortDate(bucket.from) : "";
+                return index % 5 === 0 ? formatShortDate(bucket.from) : "";
+            }
+
+            function tooltipTitle(bucket, key) {
+                if (key === "30d") return formatShortDate(bucket.from);
+                return formatDate(bucket.from) + " – " + formatHour(bucket.to);
+            }
+
+            function drawChart() {
+                if ($("dash").hidden) return;
+
+                var svg = $("chart");
+                var wrap = $("chartWrap");
+                var tooltip = $("tooltip");
+                var W = wrap.clientWidth || 700;
+                var H = 260;
+                var padL = 34;
+                var padR = 6;
+                var padT = 10;
+                var padB = 26;
+                var innerW = W - padL - padR;
+                var innerH = H - padT - padB;
+
+                svg.setAttribute("width", W);
+                svg.setAttribute("height", H);
+                svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+                while (svg.firstChild) svg.removeChild(svg.firstChild);
+                tooltip.hidden = true;
+
+                var elapsed = authenticated ? Date.now() - state.receivedAt : 0;
+                var buckets = buildBuckets(state.times, state.range, state.now + elapsed);
+                var peak = 0;
+                buckets.forEach(function (b) {
+                    if (b.value > peak) peak = b.value;
+                });
+                var top = Math.max(4, Math.ceil(peak / 4) * 4);
+
+                for (var i = 0; i <= 4; i++) {
+                    var y = padT + innerH - (innerH * i) / 4;
+                    svg.appendChild(svgEl("line", {
+                        x1: padL,
+                        x2: W - padR,
+                        y1: y,
+                        y2: y,
+                        stroke: "rgba(255,255,255,0.06)",
+                        "stroke-width": 1
+                    }));
+                    var tick = svgEl("text", {
+                        x: padL - 8,
+                        y: y + 4,
+                        "text-anchor": "end",
+                        "font-size": 10,
+                        fill: "#555970"
+                    });
+                    tick.textContent = String((top * i) / 4);
+                    svg.appendChild(tick);
+                }
+
+                if (peak === 0) {
+                    var emptyText = svgEl("text", {
+                        x: padL + innerW / 2,
+                        y: padT + innerH / 2,
+                        "text-anchor": "middle",
+                        "font-size": 12,
+                        fill: "#555970"
+                    });
+                    emptyText.textContent = "Нет созданных страниц за этот период";
+                    svg.appendChild(emptyText);
+                }
+
+                var slot = innerW / buckets.length;
+                var barW = Math.max(2, slot * 0.7);
+
+                buckets.forEach(function (bucket, index) {
+                    var x = padL + index * slot;
+                    var h = (innerH * bucket.value) / top;
+                    var bar = svgEl("rect", {
+                        x: x + (slot - barW) / 2,
+                        y: padT + innerH - h,
+                        width: barW,
+                        height: Math.max(h, bucket.value > 0 ? 2 : 0),
+                        rx: 2,
+                        fill: "#f6821f",
+                        opacity: 0.85
+                    });
+                    svg.appendChild(bar);
+
+                    var label = bucketLabel(bucket, index, state.range);
+                    if (label) {
+                        var text = svgEl("text", {
+                            x: x + slot / 2,
+                            y: H - 8,
+                            "text-anchor": "middle",
+                            "font-size": 10,
+                            fill: "#555970"
+                        });
+                        text.textContent = label;
+                        svg.appendChild(text);
+                    }
+
+                    var zone = svgEl("rect", {
+                        x: x,
+                        y: padT,
+                        width: slot,
+                        height: innerH,
+                        fill: "transparent"
+                    });
+
+                    zone.addEventListener("mouseenter", function () {
+                        bar.setAttribute("opacity", "1");
+                        tooltip.textContent = "";
+                        var time = document.createElement("div");
+                        time.className = "tooltip-time";
+                        time.textContent = tooltipTitle(bucket, state.range);
+                        var value = document.createElement("div");
+                        value.className = "tooltip-value";
+                        value.textContent = "Создано: " + bucket.value;
+                        tooltip.appendChild(time);
+                        tooltip.appendChild(value);
+                        tooltip.hidden = false;
+                        var width = tooltip.offsetWidth;
+                        var left = Math.max(0, Math.min(W - width, x + slot / 2 - width / 2));
+                        tooltip.style.left = left + "px";
+                        tooltip.style.top = "0px";
+                    });
+
+                    zone.addEventListener("mouseleave", function () {
+                        bar.setAttribute("opacity", "0.85");
+                        tooltip.hidden = true;
+                    });
+
+                    svg.appendChild(zone);
+                });
+            }
+
+            function setStat(id, value) {
+                var el = $(id);
+                var text = String(value);
+                if (el.textContent === text) return;
+                el.textContent = text;
+                el.classList.remove("bump");
+                void el.offsetWidth;
+                el.classList.add("bump");
+            }
+
+            function renderCards() {
+                var now = state.now;
+                var day = state.times.filter(function (t) { return t >= now - DAY; }).length;
+                var week = state.times.filter(function (t) { return t >= now - 7 * DAY; }).length;
+                setStat("statDay", day);
+                setStat("statWeek", week);
+                setStat("statActive", state.active);
+                setStat("statTotal", state.total);
+            }
+
+            function copyText(text, button) {
+                function done(ok) {
+                    button.textContent = ok ? "Скопировано" : "Ошибка";
+                    setTimeout(function () { button.textContent = "Копировать"; }, 1200);
+                }
+
+                function fallback() {
+                    var ta = document.createElement("textarea");
+                    ta.value = text;
+                    ta.style.position = "fixed";
+                    ta.style.opacity = "0";
+                    document.body.appendChild(ta);
+                    ta.select();
+                    var ok = false;
+                    try { ok = document.execCommand("copy"); } catch (e) { }
+                    ta.remove();
+                    done(ok);
+                }
+
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(text).then(function () { done(true); }, fallback);
+                } else {
+                    fallback();
+                }
+            }
+
+            function rowsKey() {
+                return state.recent.map(function (i) {
+                    return i.code + "|" + i.password + "|" + i.createdAt + "|" + i.expiresAt + "|" + i.status;
+                }).join(";");
+            }
+
+            function renderRows() {
+                var body = $("rows");
+                body.textContent = "";
+                $("empty").hidden = state.recent.length > 0;
+
+                state.recent.forEach(function (item, index) {
+                    var row = document.createElement("tr");
+
+                    var codeCell = document.createElement("td");
+                    codeCell.className = "mono";
+                    var link = document.createElement("a");
+                    link.className = "code-link";
+                    link.href = PAGE_BASE + item.code + "/";
+                    link.target = "_blank";
+                    link.rel = "noopener noreferrer";
+                    link.textContent = item.code;
+                    codeCell.appendChild(link);
+
+                    var passCell = document.createElement("td");
+                    var passBox = document.createElement("div");
+                    passBox.className = "pass-cell";
+                    var passText = document.createElement("span");
+                    passText.className = "mono";
+                    passText.textContent = item.password;
+                    var copy = document.createElement("button");
+                    copy.className = "copy";
+                    copy.type = "button";
+                    copy.textContent = "Копировать";
+                    copy.addEventListener("click", function () { copyText(item.password, copy); });
+                    passBox.appendChild(passText);
+                    passBox.appendChild(copy);
+                    passCell.appendChild(passBox);
+
+                    var createdCell = document.createElement("td");
+                    createdCell.textContent = formatDate(item.createdAt);
+
+                    var expiresCell = document.createElement("td");
+                    expiresCell.textContent = formatDate(item.expiresAt);
+
+                    var statusCell = document.createElement("td");
+                    var badge = document.createElement("span");
+                    badge.id = "status-" + index;
+                    badge.className = "badge " + item.status;
+                    badge.textContent = STATUS_LABELS[item.status] || item.status;
+                    badge.dataset.status = item.status;
+                    statusCell.appendChild(badge);
+
+                    row.appendChild(codeCell);
+                    row.appendChild(passCell);
+                    row.appendChild(createdCell);
+                    row.appendChild(expiresCell);
+                    row.appendChild(statusCell);
+                    body.appendChild(row);
+                });
+            }
+
+            function renderLiveStatus() {
+                var now = Date.now();
+                if (state.expiries && state.expiries.length) {
+                    var active = 0;
+                    state.expiries.forEach(function (t) { if (t > now) active++; });
+                    $("statActive").textContent = String(active);
+                }
+                state.recent.forEach(function (item, index) {
+                    var el = $("status-" + index);
+                    if (!el) return;
+                    var status = item.status === "deleted" ? "deleted" : (item.expiresAt <= now ? "expired" : "active");
+                    if (el.dataset.status !== status) {
+                        el.className = "badge " + status;
+                        el.textContent = STATUS_LABELS[status];
+                        el.dataset.status = status;
+                    }
+                });
+            }
+
+            function chartKey() {
+                return state.range + "|" + state.times.join(",") + "|" + Math.floor(Date.now() / 60000);
+            }
+
+            function renderAll() {
+                renderCards();
+                var rk = rowsKey();
+                if (rk !== lastRowsKey) {
+                    renderRows();
+                    lastRowsKey = rk;
+                }
+                var ck = chartKey();
+                if (ck !== lastChartKey) {
+                    drawChart();
+                    lastChartKey = ck;
+                }
+                renderLiveStatus();
+                $("updatedText").textContent = "Обновлено: " + formatDate(Date.now());
+                $("storageText").textContent = "Хранилище: " + (state.storage === "kv" ? "KV" : "GitHub") + " · Обновление каждые " + (REFRESH_MS / 1000) + " сек";
+            }
+
+            async function load() {
+                if (loading) return;
+                loading = true;
+                setLive("loading");
+                $("refresh").disabled = true;
+
+                try {
+                    var response = await fetch(WORKER_URL, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Accept": "application/json"
+                        },
+                        body: JSON.stringify({ action: "dashboard", password: password }),
+                        cache: "no-store"
+                    });
+
+                    var raw = await response.text();
+                    var data = null;
+                    try { data = JSON.parse(raw); } catch (e) { }
+
+                    if (!response.ok || !data || !data.success) {
+                        var message;
+                        if (data && data.error) message = data.error;
+                        else if (response.status === 404) message = "Воркер не найден по адресу " + WORKER_URL;
+                        else if (response.status === 403) message = "Сервер отклонил пароль";
+                        else if (response.status >= 500) message = "Ошибка воркера (HTTP " + response.status + ")";
+                        else message = "Сервер вернул не JSON (HTTP " + response.status + ")";
+
+                        var err = new Error(message);
+                        err.httpStatus = response.status;
+                        err.serverError = !!(data && data.error);
+                        throw err;
+                    }
+
+                    if (!Array.isArray(data.times) || !Array.isArray(data.recent)) {
+                        throw new Error("Сервер вернул некорректный формат данных");
+                    }
+
+                    state.now = data.now || Date.now();
+                    state.receivedAt = Date.now();
+                    state.times = data.times;
+                    state.expiries = Array.isArray(data.expiries) ? data.expiries : [];
+                    state.recent = data.recent;
+                    state.active = data.active || 0;
+                    state.total = data.total || 0;
+                    state.storage = data.storage || "";
+                    failures = 0;
+                    hideBanner();
+                    renderAll();
+                    setLive("live");
+
+                } catch (e) {
+                    failures++;
+                    var msg;
+                    if (e.message === "Failed to fetch" || e.name === "TypeError") {
+                        msg = "Не удалось связаться с сервером: " + WORKER_URL;
+                    } else {
+                        msg = e.message;
+                    }
+
+                    if (e.httpStatus === 403) {
+                        logout();
+                        $("error").textContent = "Неверный пароль.";
+                        throw e;
+                    }
+
+                    setLive("error");
+                    showBanner(msg + (authenticated ? " Повторим автоматически." : ""));
+                    throw e;
+
+                } finally {
+                    loading = false;
+                    $("refresh").disabled = false;
+                }
+            }
+
+            async function tick() {
+                if (timer) {
+                    clearTimeout(timer);
+                    timer = null;
+                }
+                if (!authenticated) return;
+
+                if (document.hidden) {
+                    setLive("paused");
+                    timer = setTimeout(tick, REFRESH_MS);
+                    return;
+                }
+
+                try {
+                    await load();
+                } catch (e) {
+                }
+
+                if (authenticated) timer = setTimeout(tick, REFRESH_MS);
+            }
+
+            function liveClock() {
+                if (!authenticated || document.hidden) return;
+                seconds++;
+                renderLiveStatus();
+                if (seconds % 60 === 0) drawChart();
+            }
+
+            function start() {
+                authenticated = true;
+                failures = 0;
+                if (timer) clearTimeout(timer);
+                timer = setTimeout(tick, 0);
+                if (!clockTimer) clockTimer = setInterval(liveClock, 1000);
+            }
+
+            function logout() {
+                authenticated = false;
+                if (timer) clearTimeout(timer);
+                if (clockTimer) clearInterval(clockTimer);
+                timer = null;
+                clockTimer = null;
+                loading = false;
+                password = "";
+                lastRowsKey = "";
+                lastChartKey = "";
+                $("dash").hidden = true;
+                $("lock").hidden = false;
+                $("banner").hidden = true;
+                $("password").value = "";
+                $("password").focus();
+            }
+
+            $("form").addEventListener("submit", async function (event) {
+                event.preventDefault();
+                var value = $("password").value;
+                if (!value) {
+                    $("error").textContent = "Введите пароль.";
+                    return;
+                }
+                $("submit").disabled = true;
+                $("error").textContent = "";
+                password = value;
+
+                try {
+                    await load();
+                    $("lock").hidden = true;
+                    $("dash").hidden = false;
+                    drawChart();
+                    start();
+                    $("password").value = "";
+                } catch (e) {
+                    password = "";
+                    $("error").textContent = e.httpStatus === 403
+                        ? "Неверный пароль."
+                        : (e.serverError ? e.message : "Не удалось связаться с сервером. " + e.message);
+                    $("password").value = "";
+                    $("password").focus();
+                } finally {
+                    $("submit").disabled = false;
+                }
+            });
+
+            $("logout").addEventListener("click", logout);
+
+            $("refresh").addEventListener("click", function () {
+                if (!authenticated) return;
+                load().catch(function () { });
+            });
+
+            $("bannerRetry").addEventListener("click", function () {
+                if (authenticated) load().catch(function () { });
+                else {
+                    hideBanner();
+                    $("password").focus();
+                }
+            });
+
+            $("tabs").addEventListener("click", function (event) {
+                var target = event.target.closest(".tab");
+                if (!target) return;
+                state.range = target.getAttribute("data-range");
+                document.querySelectorAll(".tab").forEach(function (el) {
+                    el.classList.toggle("active", el === target);
+                });
+                lastChartKey = "";
+                drawChart();
+            });
+
+            var resizeTimer = null;
+            window.addEventListener("resize", function () {
+                if (resizeTimer) clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(function () {
+                    if (!$("dash").hidden) {
+                        lastChartKey = "";
+                        drawChart();
+                    }
+                }, 120);
+            });
+
+            document.addEventListener("visibilitychange", function () {
+                if (!authenticated) return;
+                if (!document.hidden) {
+                    seconds = 0;
+                    load().catch(function () { });
+                } else {
+                    setLive("paused");
+                }
+            });
+
+            $("password").focus();
+        })();
+    </script>
 </body>
 </html>
