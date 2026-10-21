@@ -14,7 +14,7 @@
             --text-secondary: #8b90a0;
             --text-muted: #555970;
             --accent: #8b90a0;
-            --chart: #f6821f;
+            --chart: #9d71ff;
             --ok: #5fd38d;
             --bad: #ff7a6e;
             --border: rgba(255, 255, 255, 0.06);
@@ -47,89 +47,141 @@
             align-items: center;
             justify-content: center;
             padding: 22px;
+            position: relative;
         }
 
         .panel {
             width: 100%;
-            max-width: 380px;
-            padding: 28px 26px;
+            max-width: 420px;
+            padding: 48px 36px;
             background: var(--bg-surface);
             border: 1px solid var(--border);
-            border-radius: 14px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .lock-header {
             text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .lock-logo {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #9d71ff 0%, #6c47d6 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: 700;
+            color: white;
+            box-shadow: 0 4px 16px rgba(157, 113, 255, 0.3);
         }
 
         .title {
-            font-size: 18px;
-            font-weight: 400;
-            letter-spacing: 1px;
-            text-transform: uppercase;
+            font-size: 24px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            color: var(--text-primary);
+            margin-bottom: 8px;
         }
 
         .subtitle {
-            margin-top: 8px;
-            font-size: 12px;
+            font-size: 14px;
             color: var(--text-muted);
-            line-height: 1.6;
+            line-height: 1.5;
         }
 
         .form {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            margin-top: 18px;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            letter-spacing: 0.3px;
         }
 
         .input {
             width: 100%;
-            padding: 12px 14px;
+            padding: 14px 16px;
             background: var(--bg-base);
             border: 1px solid var(--border);
-            border-radius: 8px;
+            border-radius: 10px;
             font-family: "Consolas", monospace;
-            font-size: 18px;
-            letter-spacing: 4px;
+            font-size: 16px;
+            letter-spacing: 3px;
             text-align: center;
             color: var(--text-primary);
             outline: none;
-            transition: border-color 0.15s;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
 
         .input:focus {
-            border-color: #8b90a0;
+            border-color: var(--chart);
+            box-shadow: 0 0 0 3px rgba(157, 113, 255, 0.1);
         }
 
         .button {
-            padding: 10px 18px;
-            background: var(--accent);
+            padding: 14px 24px;
+            background: var(--chart);
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             font-family: inherit;
-            font-size: 12px;
-            letter-spacing: 1px;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
             text-transform: uppercase;
             color: #fff;
             cursor: pointer;
-            transition: background 0.15s, color 0.15s;
+            transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+            box-shadow: 0 2px 8px rgba(157, 113, 255, 0.2);
         }
 
         .button:hover {
-            background: rgba(139, 144, 160, 0.14);
-            color: var(--accent);
+            background: #8a5ee8;
+            box-shadow: 0 4px 12px rgba(157, 113, 255, 0.3);
+        }
+
+        .button:active {
+            transform: translateY(1px);
         }
 
         .button:disabled {
             opacity: 0.6;
             cursor: default;
+            transform: none;
         }
 
         .error {
-            min-height: 18px;
-            margin-top: 12px;
-            font-size: 12px;
+            min-height: 20px;
+            font-size: 13px;
             line-height: 1.5;
             color: var(--bad);
-            overflow-wrap: anywhere;
+            text-align: center;
+            padding: 8px;
+            background: rgba(255, 122, 110, 0.08);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 122, 110, 0.2);
+        }
+
+        .lock-footer {
+            margin-top: 24px;
+            text-align: center;
+            font-size: 11px;
+            color: var(--text-muted);
+            letter-spacing: 0.3px;
         }
 
         .dash {
@@ -149,8 +201,8 @@
 
         .brand {
             font-size: 16px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 500;
         }
 
         .topbar-right {
@@ -158,50 +210,6 @@
             align-items: center;
             gap: 12px;
             flex-wrap: wrap;
-        }
-
-        .live {
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            font-size: 11px;
-            letter-spacing: 1px;
-            color: var(--text-secondary);
-        }
-
-        .dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: var(--text-muted);
-        }
-
-        .live.ok .dot {
-            background: var(--ok);
-            box-shadow: 0 0 0 0 rgba(95, 211, 141, 0.5);
-            animation: pulse 2s infinite;
-        }
-
-        .live.loading .dot {
-            background: var(--chart);
-        }
-
-        .live.error .dot {
-            background: var(--bad);
-        }
-
-        @keyframes pulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(95, 211, 141, 0.45);
-            }
-
-            70% {
-                box-shadow: 0 0 0 7px rgba(95, 211, 141, 0);
-            }
-
-            100% {
-                box-shadow: 0 0 0 0 rgba(95, 211, 141, 0);
-            }
         }
 
         .updated {
@@ -489,6 +497,7 @@
             color: var(--text-muted);
             line-height: 1.7;
             margin-top: 4px;
+            text-align: center;
         }
 
         @media (max-width: 820px) {
@@ -509,19 +518,30 @@
             .card {
                 padding: 16px 14px;
             }
+
+            .panel {
+                padding: 32px 24px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="lock-wrap" id="lock">
         <main class="panel">
-            <h1 class="title">Moolonic Cloud</h1>
-            <p class="subtitle">Панель управления страницами</p>
+            <div class="lock-header">
+                <div class="lock-logo">M</div>
+                <h1 class="title">Moolonic Cloud</h1>
+                <p class="subtitle">Панель управления страницами</p>
+            </div>
             <form class="form" id="form">
-                <input class="input" id="password" type="password" autocomplete="off" autofocus>
-                <button class="button" id="submit" type="submit">Открыть</button>
+                <div class="form-group">
+                    <label class="form-label" for="password">Пароль доступа</label>
+                    <input class="input" id="password" type="password" autocomplete="off" autofocus>
+                </div>
+                <button class="button" id="submit" type="submit">Войти в систему</button>
             </form>
-            <div class="error" id="error"></div>
+            <div class="error" id="error" hidden></div>
+            <div class="lock-footer">Moolonic Cloud v2.0</div>
         </main>
     </div>
 
@@ -529,10 +549,6 @@
         <header class="topbar">
             <div class="brand">Moolonic Cloud</div>
             <div class="topbar-right">
-                <div class="live" id="live">
-                    <span class="dot"></span>
-                    <span id="liveText">ПОДКЛЮЧЕНИЕ</span>
-                </div>
                 <span class="updated" id="updatedText">Обновлено: —</span>
                 <button class="ghost" id="refresh" type="button">Обновить</button>
                 <button class="ghost" id="logout" type="button">Выйти</button>
@@ -565,7 +581,7 @@
 
         <section class="card">
             <div class="card-head">
-                <h2 class="card-title">Новые ссылки</h2>
+                <h2 class="card-title">Распределение ссылок</h2>
                 <div class="tabs" id="tabs">
                     <button class="tab active" type="button" data-range="24h">24 часа</button>
                     <button class="tab" type="button" data-range="7d">7 дней</button>
@@ -573,7 +589,7 @@
                 </div>
             </div>
             <div class="chart-wrap" id="chartWrap">
-                <svg id="chart" role="img" aria-label="График созданных страниц"></svg>
+                <svg id="chart" role="img" aria-label="Гистограмма распределения"></svg>
                 <div class="tooltip" id="tooltip" hidden></div>
             </div>
         </section>
@@ -600,6 +616,7 @@
         </section>
 
         <div class="footer" id="storageText"></div>
+        <div class="footer">Moolonic Cloud</div>
     </div>
 
     <script>
@@ -679,17 +696,6 @@
                     return d.getTime();
                 }
                 return Math.ceil(now / step) * step;
-            }
-
-            function setLive(mode) {
-                var el = $("live");
-                el.className = "live " + (mode === "live" ? "ok" : mode);
-                $("liveText").textContent = {
-                    live: "LIVE",
-                    loading: "ОБНОВЛЕНИЕ",
-                    error: "НЕТ СВЯЗИ",
-                    paused: "ПАУЗА"
-                }[mode] || "ОЖИДАНИЕ";
             }
 
             function showBanner(msg) {
@@ -804,7 +810,7 @@
                 }
 
                 var slot = innerW / buckets.length;
-                var barW = Math.max(2, slot * 0.7);
+                var barW = Math.max(2, slot * 0.85);
 
                 buckets.forEach(function (bucket, index) {
                     var x = padL + index * slot;
@@ -814,8 +820,8 @@
                         y: padT + innerH - h,
                         width: barW,
                         height: Math.max(h, bucket.value > 0 ? 2 : 0),
-                        rx: 2,
-                        fill: "#f6821f",
+                        rx: 3,
+                        fill: "#9d71ff",
                         opacity: 0.85
                     });
                     svg.appendChild(bar);
@@ -1019,7 +1025,6 @@
             async function load() {
                 if (loading) return;
                 loading = true;
-                setLive("loading");
                 $("refresh").disabled = true;
 
                 try {
@@ -1066,7 +1071,6 @@
                     failures = 0;
                     hideBanner();
                     renderAll();
-                    setLive("live");
 
                 } catch (e) {
                     failures++;
@@ -1080,10 +1084,10 @@
                     if (e.httpStatus === 403) {
                         logout();
                         $("error").textContent = "Неверный пароль.";
+                        $("error").hidden = false;
                         throw e;
                     }
 
-                    setLive("error");
                     showBanner(msg + (authenticated ? " Повторим автоматически." : ""));
                     throw e;
 
@@ -1101,7 +1105,6 @@
                 if (!authenticated) return;
 
                 if (document.hidden) {
-                    setLive("paused");
                     timer = setTimeout(tick, REFRESH_MS);
                     return;
                 }
@@ -1142,6 +1145,7 @@
                 $("dash").hidden = true;
                 $("lock").hidden = false;
                 $("banner").hidden = true;
+                $("error").hidden = true;
                 $("password").value = "";
                 $("password").focus();
             }
@@ -1151,10 +1155,11 @@
                 var value = $("password").value;
                 if (!value) {
                     $("error").textContent = "Введите пароль.";
+                    $("error").hidden = false;
                     return;
                 }
                 $("submit").disabled = true;
-                $("error").textContent = "";
+                $("error").hidden = true;
                 password = value;
 
                 try {
@@ -1169,6 +1174,7 @@
                     $("error").textContent = e.httpStatus === 403
                         ? "Неверный пароль."
                         : (e.serverError ? e.message : "Не удалось связаться с сервером. " + e.message);
+                    $("error").hidden = false;
                     $("password").value = "";
                     $("password").focus();
                 } finally {
@@ -1218,8 +1224,6 @@
                 if (!document.hidden) {
                     seconds = 0;
                     load().catch(function () { });
-                } else {
-                    setLive("paused");
                 }
             });
 
